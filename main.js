@@ -41,7 +41,7 @@ function getRandomPic(type, res) {
                     imgs: body.data.datas
                 };
 
-                var rdmIndex = Math.floor(Math.random() * 19);
+                var rdmIndex = Math.floor(Math.random() * body.data.datas.length);
                 var picUrl = body.data.datas[rdmIndex].pictureUrl + "?x-oss-process=image/resize,m_lfit,h_720,w_720";
                 var pixReq = imgReq(encodeURI(picUrl));
                 pixReq.pipe(res);
@@ -54,7 +54,7 @@ function getRandomPic(type, res) {
         });
     } else {
         if (new Date().getTime() - cachedImages[type].reqDate < 1000 * 60 * 60) {
-            var rdmIndex = Math.floor(Math.random() * 19);
+            var rdmIndex = Math.floor(Math.random() * cachedImages[type].imgs.length);
             var picUrl = cachedImages[type].imgs[rdmIndex].pictureUrl + "?x-oss-process=image/resize,m_lfit,h_720,w_720";
             var pixReq = imgReq(encodeURI(picUrl));
             pixReq.pipe(res);
