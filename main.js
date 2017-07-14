@@ -25,7 +25,7 @@ var imgReq = request.defaults({
     }
 });
 
-function getRandomPic(type, res) {
+function getRandomPic(type,process, res) {
     if (!cachedImages[type]) {
         baseRequest.post('http://www.ssyer.com/pc/order/orderList', {
             form: {
@@ -41,32 +41,35 @@ function getRandomPic(type, res) {
                     imgs: body.data.datas
                 };
 
-                var rdmIndex = Math.floor(Math.random() * body.data.datas.length);
-                var picUrl = body.data.datas[rdmIndex].pictureUrl + "?x-oss-process=image/resize,m_lfit,h_720,w_720";
-                var pixReq = imgReq(encodeURI(picUrl));
-                pixReq.pipe(res);
+                responseImage(body.data.datas,process,res);
             } else {
-                let err =error || "Server image response is empty";
+                let err = error || "Server image response is empty";
                 console.log(err);
-                res.writeHead(200, {"Content-Type": "text/plain"});
+                res.writeHead(200, {
+                    "Content-Type": "text/plain"
+                });
                 res.end(err);
             }
         });
     } else {
         if (new Date().getTime() - cachedImages[type].reqDate < 1000 * 60 * 60) {
-            var rdmIndex = Math.floor(Math.random() * cachedImages[type].imgs.length);
-            var picUrl = cachedImages[type].imgs[rdmIndex].pictureUrl + "?x-oss-process=image/resize,m_lfit,h_720,w_720";
-            var pixReq = imgReq(encodeURI(picUrl));
-            pixReq.pipe(res);
+            responseImage(cachedImages[type].imgs,process,res);
         } else {
             cachedImages[type] = null;
-            getRandomPic(req, res);
+            getRandomPic(type,process, res);
         }
     }
 }
 
+function responseImage(images,process,res) {
+    var rdmIndex = Math.floor(Math.random() * images.length);
+    var picUrl = images[rdmIndex].pictureUrl + "?x-oss-process=" + process;
+    var pixReq = imgReq(encodeURI(picUrl));
+    pixReq.pipe(res);
+}
+
 http.createServer(function (req, resp) {
     var queryData = url.parse(req.url, true).query;
-    getRandomPic(queryData.type || 21, resp);
+    getRandomPic(queryData.type || 21, queryData.process || "image/resize,m_lfit,h_720,w_720", resp);
 
 }).listen(8085);
