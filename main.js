@@ -6,6 +6,7 @@ var cachedImages = [];
 var options = {
 
     json: true,
+    strictSSL:false,
     headers: {
         'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/59.0.3071.115 Safari/537.36'
     }
@@ -27,7 +28,7 @@ var imgReq = request.defaults({
 
 function getRandomPic(type,process, res) {
     if (!cachedImages[type]) {
-        baseRequest.post('http://www.ssyer.com/pc/order/orderList', {
+        baseRequest.post('https://www.ssyer.com/pc/orderAndVodie/approveOrderAndVodieList', {
             form: {
                 labelId: type,
                 start: 0,
