@@ -28,21 +28,15 @@ var imgReq = request.defaults({
 
 function getRandomPic(type,process, res) {
     if (!cachedImages[type]) {
-        baseRequest.post('https://www.ssyer.com/pc/orderAndVodie/approveOrderAndVodieList', {
-            form: {
-                labelId: type,
-                start: 0,
-                limit: 20
-            }
-        }, function (error, response, body) {
+        baseRequest.get(`https://web.ssyer.com/workItem/searchByTagId?createdAt=1532501075&tagId=${type}&size=20&pageNo=1`, function (error, response, body) {
 
-            if (!error && body.data.datas) {
+            if (!error && body.data) {
                 cachedImages[type] = {
                     reqDate: new Date().getTime(),
-                    imgs: body.data.datas
+                    imgs: body.data
                 };
 
-                responseImage(body.data.datas,process,res);
+                responseImage(body.data,process,res);
             } else {
                 let err = error || "Server image response is empty";
                 console.log(err);
@@ -64,13 +58,13 @@ function getRandomPic(type,process, res) {
 
 function responseImage(images,process,res) {
     var rdmIndex = Math.floor(Math.random() * images.length);
-    var picUrl = images[rdmIndex].pictureUrl + "?x-oss-process=" + process;
+    var picUrl = images[rdmIndex].link + "?x-oss-process=" + process;
     var pixReq = imgReq(encodeURI(picUrl));
     pixReq.pipe(res);
 }
 
 http.createServer(function (req, resp) {
     var queryData = url.parse(req.url, true).query;
-    getRandomPic(queryData.type || 21, queryData.process || "image/resize,m_lfit,h_720,w_720", resp);
+    getRandomPic(queryData.type || 'rkSDHWB1Q', queryData.process || "image/resize,m_lfit,h_720,w_720", resp);
 
 }).listen(8085);
